@@ -1,0 +1,36 @@
+@startuml
+!include <tupadr3/common>
+
+!define ICONURL https://raw.githubusercontent.com/Roemer/plantuml-office/master/office2014
+!includeurl ICONURL/Communications/system_mailbox.puml
+
+!include <logos/angular>
+!include <logos/dotnet>
+!include <logos/xamarin>
+!include <logos/nodejs>
+!include <logos/typescript>
+!include <logos/php>
+!include <cloudinsight/sqlserver>
+skinparam linetype polyline
+left to right direction
+
+package "Sales System" as salesSystem {
+    component "csharp-sales-system-api \n                <$dotnet>        " as csharpSalesSystemApi #SkyBlue
+    component "angular-sales-system-web \n             <$angular>       " as angularSalesSystemWeb #SkyBlue
+    component "xamarin-sales-system-app \n                  <$xamarin>       " as xamarinSalesSystemApp #SkyBlue
+    component "nodejs-sales-system-web-bff \n                  <$nodejs>       " as nodejsSalesSystemWebBff #SkyBlue
+    component "typescript-sales-system-app-bff \n                  <$typescript>       " as typescriptSalesSystemAppBff #SkyBlue
+    component "sales-system-db \n         <$sqlserver>       " as salesSystemdb #SkyBlue
+    component "php-sales-system-notifier-api \n                    <$php>       " as phpSalesSystemNotifierApi #SkyBlue
+    component "smtp-server \n     <$system_mailbox>       " as smtpServer #SkyBlue
+
+    nodejsSalesSystemWebBff --o csharpSalesSystemApi: "Query"
+    csharpSalesSystemApi --o salesSystemdb: "Query"
+    nodejsSalesSystemWebBff --o phpSalesSystemNotifierApi: "Send mail"
+    phpSalesSystemNotifierApi --o smtpServer: "Send mail"
+    angularSalesSystemWeb --o nodejsSalesSystemWebBff: "Http / json / JWT"
+    xamarinSalesSystemApp --o typescriptSalesSystemAppBff: "Http / json / JWT"
+    typescriptSalesSystemAppBff --o phpSalesSystemNotifierApi: "Query"
+    typescriptSalesSystemAppBff --o smtpServer: "Send mail"
+}
+@endumlwhic
